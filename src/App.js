@@ -2,37 +2,60 @@ import React, { useState, useEffect } from 'react'
 
 import Search from './components/Search'
 import EntryForm from './components/EntryForm'
+import SnippetContainer from './components/SnippetContainer'
 
-const message=
-`
-const index = 1; 
-const amountToDelete = 1;
-const replacement = 'john';
+const snippetObject = {
+  title: 'replace element',
+  content:
+  `
+  const index = 1; 
+  const amountToDelete = 1;
+  const replacement = 'john';
 
-const arr = ['hi', 'tom', 'how', 'are', 'you']
+  const arr = ['hi', 'tom', 'how', 'are', 'you']
 
-arr.splice(index, amountToDelete, replacement)
+  arr.splice(index, amountToDelete, replacement)
 
-// RESULT
-['hi', 'john', 'how', 'are', 'you']`
+  // RESULT
+  ['hi', 'john', 'how', 'are', 'you']`
+}
+
+// what next:
+// list displays snippet titles,
+// click on snippet title to display full snippet,
+// use form to create new snippet
+
+// implement search
+// categories
+
 
 function App() {
 
 const [snippets, setSnippets] = useState([])
 const [newTitle, setNewTitle] = useState('')
 const [newSnippet, setNewSnippet] = useState('')
+const [currentSnippet, setCurrentSnippet] = useState(snippetObject)
 // const [newTag, setNewTags] = useState('')
 
+
+// FORM CONTROLS
 const handleSubmit = (event) => {
   event.preventDefault()
   console.log('submitted')
 }
-
 const handleTitleChange = event => {
   console.log(event.target.value)
   setNewTitle(event.target.value)
 }
 const handleSnippetChange = event => {setNewSnippet(event.target.value)}
+
+// fill snippet container with selected snippet
+const displaySnippet = (currentSnippet) => {
+  if(currentSnippet === '') return
+  return <SnippetContainer snippetObject={currentSnippet} />
+}
+
+
 
   return (
     <div className="App">
@@ -54,19 +77,7 @@ const handleSnippetChange = event => {setNewSnippet(event.target.value)}
          </ul>
       </div>
 
-      <div className="snippet">
-         <h2>replace element in array using splice</h2>
-         <code>
-           {message}
-         </code>
-         
-        <div className="snippetButtonsContainer">
-         <button>copy</button>
-         <button>edit</button>
-         <button>delete</button>
-         </div>
-      </div>
-
+      {displaySnippet(currentSnippet)}
     </div>
   );
 }
