@@ -25,16 +25,25 @@ header {
 
 .search {
  margin: auto;
- text-align: center;
  padding: 1em;
  border: 1px solid black;
 }
 
 .results {
   margin: auto;
-  text-align: center;
+  text-align: left;
   padding: 1em;
   border: 1px solid black;
+  
+}
+
+li {
+  all: inherit;
+}
+
+li:hover {
+  cursor: default;
+  font-weight: bold;
 }
 
 .snippet {
