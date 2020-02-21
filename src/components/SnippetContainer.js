@@ -1,11 +1,12 @@
 import React from 'react'
 
 const SnippetContainer = ({snippetObject, handleCopy, handleEdit, handleDelete}) => (
-    <div className="snippet">
+    <div className="snippet flexChild">
       <h2>{snippetObject.title}</h2>
       <code className="codeSnippet">
         {snippetObject.content}
       </code>
+      <p>{snippetObject.category}</p>
       
       <div className="snippetButtonsContainer">
         <button className="copy" onClick={handleCopy}>copy</button>

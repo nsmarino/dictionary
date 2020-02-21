@@ -4,6 +4,7 @@ import Search from './components/Search'
 import EntryForm from './components/EntryForm'
 import SnippetContainer from './components/SnippetContainer'
 import List from './components/List'
+import DummyContainer from './components/DummyContainer'
 
 const sampleArray = [
   {
@@ -21,6 +22,7 @@ const sampleArray = [
     // RESULT
     ['hi', 'john', 'how', 'are', 'you']
     `,
+    category: 'array',
     id: 1,
   },
   {
@@ -30,15 +32,17 @@ const sampleArray = [
     this is how to install a library
     do you get it?
     `,
+    category: 'library',
     id: 2,
   },
   {
-    title: 'import from subfolder',
+    title: 'box-shadow',
     content:
     `
-    will you import from subfolder
-    or let it slip?
+    box-shadow
+    b o x - s h a d o w
     `,
+    category: 'css',
     id: 3,
   },
 ]
@@ -46,7 +50,6 @@ const sampleArray = [
 // what next:
 // FRIDAY:
 
-// categories
 // in ALL tab: view A-Z, view BY CATEGORY
 // edit snippets
 // save to local storage
@@ -60,27 +63,44 @@ const [snippets, setSnippets] = useState(sampleArray)
 const [newTitle, setNewTitle] = useState('')
 const [newSnippet, setNewSnippet] = useState('')
 const [currentSnippet, setCurrentSnippet] = useState('')
-// const [newTag, setNewTags] = useState('')
+const [newCategory, setNewCategory] = useState('')
+const [formVisibility, setFormVisibility] = useState(false)
+
+// KEEPING FOR NOW AS EXAMPLE OF USE-EFFECT HOOK
+// useEffect(() => {
+//   const tabDivs = Array.from(document.querySelectorAll('.tab'))
+//   setTabs(tabDivs)
+// },[]);
 
 // FORM
 const handleSubmit = (event) => {
   event.preventDefault()
+  if (newTitle === '' || newSnippet === '' || newCategory === ''  ) return
+  console.log(newCategory)
+  console.log(snippets)
   const id = snippets.length + 1
   const submission = {
     title: newTitle,
     content: newSnippet,
+    category: newCategory,
     id: id
   }
-  const newArr = [...snippets, submission]
-  setSnippets(newArr)
+  const updatedList = [...snippets, submission]
+  setSnippets(updatedList)
   setNewTitle('')
   setNewSnippet('')
+  setNewCategory('')
+  setCurrentSnippet(submission)
+  showForm()
 }
 const handleTitleChange = event => {
   setNewTitle(event.target.value)
 }
 const handleSnippetChange = event => {setNewSnippet(event.target.value)}
 
+const handleCategoryChange = event => {
+  setNewCategory(event.target.value)
+}
 
 // SEARCH
 const submitSearch = (event) => {
@@ -104,21 +124,17 @@ const submitSearch = (event) => {
     container.appendChild(item)
   })
 }
-
 const clearSearchResults = () => {
   const container = document.getElementById('resultList')
   while (container.firstChild) {
     container.firstChild.remove()
   }
 }
-
 const clearSearch = () => {
   clearSearchResults()
   const search = document.getElementById('search')
   search.value=''
 }
-
-
 
 // RESULT LIST
 const selectSnippet = (event) => {
@@ -130,7 +146,7 @@ const selectSnippet = (event) => {
 
 // DISPLAYED SNIPPET
 const displaySnippet = (currentSnippet) => {
-  if(currentSnippet === '') return
+  if(currentSnippet === '') return <DummyContainer />
   return <SnippetContainer snippetObject={currentSnippet} handleCopy={copyToClipboard} handleEdit={handleEdit} handleDelete={handleDelete} />
 }
 const copyToClipboard = () => {
@@ -151,31 +167,60 @@ const handleDelete = () => {
   setCurrentSnippet('')
 }
 
+// nav
+const showForm = () => {
+  const all = document.getElementById('all')
+  const newForm = document.getElementById('newForm')
+  setFormVisibility(!formVisibility)
+  if (formVisibility) {
+    all.style.display = 'block'
+    newForm.style.display = 'none'
+  } else {
+    all.style.display = 'none'
+    newForm.style.display = 'block'
+  }
+
+  // formVisibility ? all.style.display = '' : all.style.display = 'none'
+  // formVisibility ? newForm.style.display = 'none' : newForm.style.display = ''
+}
+
+
+const searchClickAway = (event) => {
+  if (event.target.className !== 'searchContainer') clearSearch()
+}
+
   return (
-  <div className="App">
+  <div className="App" onClick={searchClickAway}>
 
-      <header><h1>snippet dictionary</h1></header>
-
-      <EntryForm 
-         handleSubmit={handleSubmit}
-         handleTitleChange={handleTitleChange}
-         handleSnippetChange={handleSnippetChange}
-         newTitle={newTitle}
-         newSnippet={newSnippet}
-      />
-
+      <header>
       <Search
         handleSubmit={submitSearch}
         clearSearch={clearSearch}
         handleClick={selectSnippet}
       />
+      </header>
 
+
+
+      <main>
+      <EntryForm 
+         handleSubmit={handleSubmit}
+         handleTitleChange={handleTitleChange}
+         handleSnippetChange={handleSnippetChange}
+         handleCategoryChange={handleCategoryChange}
+         newTitle={newTitle}
+         newSnippet={newSnippet}
+         newCategory={newCategory}
+         showForm={showForm}
+      />
       <List 
         results={snippets}
         handleClick={selectSnippet}
+        showForm={showForm}
       />
 
       {displaySnippet(currentSnippet)}
+      </main>
 
   </div>
   );
