@@ -6,92 +6,84 @@ import SnippetContainer from './components/SnippetContainer'
 import List from './components/List'
 import DummyContainer from './components/DummyContainer'
 
-const sampleArray = [
-  {
-    title: 'replace element',
-    content:
-    `
-    const index = 1; 
-    const amountToDelete = 1;
-    const replacement = 'john';
-  
-    const arr = ['hi', 'tom', 'how', 'are', 'you']
-  
-    arr.splice(index, amountToDelete, replacement)
-  
-    // RESULT
-    ['hi', 'john', 'how', 'are', 'you']
-    `,
-    category: 'array',
-    id: 1,
-  },
-  {
-    title: 'install library',
-    content:
-    `
-    this is how to install a library
-    do you get it?
-    `,
-    category: 'library',
-    id: 2,
-  },
-  {
-    title: 'box-shadow',
-    content:
-    `
-    box-shadow
-    b o x - s h a d o w
-    `,
-    category: 'css',
-    id: 3,
-  },
-]
-
 // what next:
-// FRIDAY:
 
-// in ALL tab: view A-Z, view BY CATEGORY
-// edit snippets
-// save to local storage
-
-// eventually: move to server, user administration, download snippets as JSON
+// fine tune editor - how it submits
+// refactoring -- migrate to redux?
+// improve search UX
+// then: move to server, user administration, download snippets as JSON
 
 
 function App() {
 
-const [snippets, setSnippets] = useState(sampleArray)
+const [snippets, setSnippets] = useState([])
 const [newTitle, setNewTitle] = useState('')
 const [newSnippet, setNewSnippet] = useState('')
 const [currentSnippet, setCurrentSnippet] = useState('')
 const [newCategory, setNewCategory] = useState('')
+const [categories, setCategories] = useState([])
 const [formVisibility, setFormVisibility] = useState(false)
 
-// KEEPING FOR NOW AS EXAMPLE OF USE-EFFECT HOOK
-// useEffect(() => {
-//   const tabDivs = Array.from(document.querySelectorAll('.tab'))
-//   setTabs(tabDivs)
-// },[]);
+const [editorVis, setEditorVis] = useState(true)
+
+const [currentSnippetTitle, setCurrentSnippetTitle] = useState('')
+const [currentSnippetContent, setCurrentSnippetContent] = useState('')
+const [currentSnippetCategory, setCurrentSnippetCategory] = useState('')
+
+useEffect(() => {
+  const saved = window.localStorage.getItem('savedSnippets')
+  if (saved) {
+    const initialSnippets = JSON.parse(saved)
+    setSnippets(initialSnippets)
+  }
+},[]);
+
+// helper functions
+const compare = (a, b) => {
+  const snippetA = a.title.toLowerCase();
+  const snippetB = b.title.toLowerCase();
+
+  let comparison = 0;
+  if (snippetA > snippetB) {
+    comparison = 1;
+  } else if (snippetA < snippetB) {
+    comparison = -1;
+  }
+  return comparison;
+}
+const saveToLocalStorage = snippetList => {
+  window.localStorage.setItem(
+    'savedSnippets', JSON.stringify(snippetList)
+  )   
+}
+
 
 // FORM
 const handleSubmit = (event) => {
   event.preventDefault()
   if (newTitle === '' || newSnippet === '' || newCategory === ''  ) return
-  console.log(newCategory)
-  console.log(snippets)
-  const id = snippets.length + 1
+
+  const generateId = () => {
+    return Number((Math.random() * 1000000).toFixed(0))
+  }
   const submission = {
     title: newTitle,
     content: newSnippet,
     category: newCategory,
-    id: id
+    id: generateId()
   }
   const updatedList = [...snippets, submission]
+  updatedList.sort(compare)
+
+  saveToLocalStorage(updatedList)
+
   setSnippets(updatedList)
   setNewTitle('')
   setNewSnippet('')
   setNewCategory('')
   setCurrentSnippet(submission)
   showForm()
+  categorySort(updatedList)
 }
 const handleTitleChange = event => {
   setNewTitle(event.target.value)
@@ -144,10 +136,24 @@ const selectSnippet = (event) => {
   setCurrentSnippet(snippetToDisplay)
 }
 
+
+
+
+
 // DISPLAYED SNIPPET
 const displaySnippet = (currentSnippet) => {
   if(currentSnippet === '') return <DummyContainer />
-  return <SnippetContainer snippetObject={currentSnippet} handleCopy={copyToClipboard} handleEdit={handleEdit} handleDelete={handleDelete} />
+  return <SnippetContainer 
+           snippetObject={currentSnippet} 
+           handleCopy={copyToClipboard} 
+           handleDelete={handleDelete} 
+           handleEdit={handleEdit}
+           editTitle={handleCurrentSnippetTitleChange}
+           editContent={handleCurrentSnippetContentChange}
+           editCategory={handleCurrentSnippetCategoryChange}
+           toggleEditor={toggleEditor}
+           editorVis={editorVis}
+         />
 }
 const copyToClipboard = () => {
   var textField = document.createElement('textarea')
@@ -158,14 +164,37 @@ const copyToClipboard = () => {
   textField.remove()
   console.log('copied!')
 }
-const handleEdit = () => {
-  console.log('editing!')
-}
+
 const handleDelete = () => {
   const filteredSnippets = snippets.filter(snip => snip !== currentSnippet)
   setSnippets(filteredSnippets)
+  categorySort(filteredSnippets)
+  saveToLocalStorage(filteredSnippets)
+  // window.localStorage.setItem(
+  //   'savedSnippets', JSON.stringify(filteredSnippets)
+  // )  
   setCurrentSnippet('')
 }
+
+const handleEdit = (event) => {
+  event.preventDefault()
+  const editedSnippetObject = {
+    title: currentSnippetTitle,
+    content: currentSnippetContent,
+    category: currentSnippetCategory,
+    id: currentSnippet.id
+  }
+  const updatedSnippets = snippets.map(s => s.id !== currentSnippet.id ? s : editedSnippetObject).sort(compare)
+  setCurrentSnippet(editedSnippetObject)
+  setSnippets(updatedSnippets)
+  categorySort(updatedSnippets)
+  saveToLocalStorage(updatedSnippets)
+  toggleEditor()
+}
+const toggleEditor = () => setEditorVis(!editorVis)
+const handleCurrentSnippetTitleChange = event => {setCurrentSnippetTitle(event.target.value)}
+const handleCurrentSnippetContentChange = event => {setCurrentSnippetContent(event.target.value)}
+const handleCurrentSnippetCategoryChange = event => {setCurrentSnippetCategory(event.target.value)}
 
 // nav
 const showForm = () => {
@@ -179,9 +208,24 @@ const showForm = () => {
     all.style.display = 'none'
     newForm.style.display = 'block'
   }
+}
 
-  // formVisibility ? all.style.display = '' : all.style.display = 'none'
-  // formVisibility ? newForm.style.display = 'none' : newForm.style.display = ''
+const categorySort = (snippetCollection) => {
+  const allCategories = snippetCollection.map(s => s.category)
+  function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+  }
+  const uniqueCats = allCategories.filter(onlyUnique).sort()
+
+  const uniqueCatObjects = uniqueCats.map(cat => {
+    const matchingSnippets = snippetCollection.filter(s => s.category === cat)
+    const catObj = {
+      category: cat,
+      snippets: matchingSnippets
+    }
+    return catObj
+  })
+  setCategories(uniqueCatObjects)
 }
 
 
@@ -200,8 +244,6 @@ const searchClickAway = (event) => {
       />
       </header>
 
-
-
       <main>
       <EntryForm 
          handleSubmit={handleSubmit}
@@ -213,10 +255,13 @@ const searchClickAway = (event) => {
          newCategory={newCategory}
          showForm={showForm}
       />
+
       <List 
-        results={snippets}
+        snippets={snippets}
         handleClick={selectSnippet}
         showForm={showForm}
+        categorySort={categorySort}
+        categories={categories}
       />
 
       {displaySnippet(currentSnippet)}

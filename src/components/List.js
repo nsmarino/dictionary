@@ -1,15 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Categories from './Categories'
 
-const List = ({results, handleClick, showForm}) => {
+const List = ({snippets, handleClick, showForm, categorySort, categories}) => {
+  const [categoryView, setCategoryView] = useState(true)
+
+  const listSnippets = () => snippets.map(s => <li key={s.id}>{s.title}</li>) 
   
-  const listResults = () => results.map(result => <li key={result.id}>{result.title}</li>) 
+  const showCategoryView = () => {
+    categorySort(snippets)
+    setCategoryView(!categoryView)
+  }
   return (
     <div id="all" className="flexChild">
-      <h2>dictionary</h2> <button>sort by category</button>
+
+      <h2>dictionary</h2> 
+      
+      <button onClick={showCategoryView}>{categoryView ? 'sort by category' : 'show all'}</button>
+
+      { categoryView ? 
         <ul onClick={handleClick}>
-          {listResults()}
+          {listSnippets()}
         </ul>
+        :
+        <Categories cat={categories} handleClick={handleClick}/>
+      }
+        
         <button onClick={showForm}>new</button>
+        
     </div>
   )
 }
