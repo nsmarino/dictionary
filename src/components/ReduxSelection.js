@@ -1,4 +1,7 @@
 import React from 'react'
+import { deleteItem } from '../reducers/itemReducer'
+import { toggleEditorView } from '../reducers/viewReducer'
+
 
 const ReduxSelection = ({store}) => {
 
@@ -15,21 +18,37 @@ const ReduxSelection = ({store}) => {
   }
 
 
-return (
+  const switchToEditor = () => {
+    store.dispatch(toggleEditorView())
+  }
+
+  const handleDelete = () => {
+    store.dispatch(deleteItem(selection.id))
+  }
+
+  return (
   <div>
-  <h2>{selection.title}</h2>
-      <code className="codeSnippet">
-        {selection.content}
-      </code>
-      <p>{selection.category}</p>
-      
-      <div className="snippetButtonsContainer">
-        <button className="copy" onClick={handleCopy}>copy</button>
-        {/* <button onClick={toggleEditor}>edit</button>
-        <button onClick={handleDelete}>delete</button>  */}
-      </div>
+  {  selection ?
+    <div>
+    <h2>{selection.title}</h2>
+        <code className="codeSnippet">
+          {selection.content}
+        </code>
+        <p>{selection.category}</p>
+        
+        <div className="snippetButtonsContainer">
+          <button className="copy" onClick={handleCopy}>copy</button>
+          <button onClick={switchToEditor}>edit</button>
+          <button onClick={handleDelete}>delete</button> 
+        </div>
+    </div>
+    :
+    <div>
+      <h3>click an item to view it</h3>
+    </div>
+  }
   </div>
-    )
+      )
 }
 
 export default ReduxSelection

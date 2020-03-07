@@ -1,7 +1,11 @@
-const reducer = (state = null, action) => {
+const initialState = ['library', 'css', 'array']
+
+const reducer = (state = initialState, action) => {
     switch (action.type) {
       case 'SET_CAT':
           return action.data
+      case 'NEW_CAT':
+          return state.concat(action.data)
       default: 
         return state
     }
@@ -13,6 +17,13 @@ const reducer = (state = null, action) => {
       data: cats
     }
   }
+
+  const addCategory = newCat => {
+    return {
+      type: 'NEW_CAT',
+      data: newCat
+    }
+  }
   
-  export { setCategories }
+  export { setCategories, addCategory }
   export default reducer

@@ -1,15 +1,12 @@
-const initialState = {
-    title: 'vons',
-    content: 'food lion',
-    category: 'aldi',
-    id: 12345
-}
-
-const reducer = (state = initialState, action) => {
+const reducer = (state = null, action) => {
     switch (action.type) {
       case 'SET':
         const selection = action.data
         return selection
+      case 'DELETE':
+        return null
+      case 'EDIT_CONTENT':
+        return action.data.newItem
       default: 
         return state
     }

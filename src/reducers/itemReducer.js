@@ -31,32 +31,35 @@ const alphaSort = (a, b) => {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'EDIT_CONTENT':
-      const id = action.data.id 
-        const itemToChange = state.find(i => i.id === id)
+      const idEdit = action.data.id 
+        const itemToChange = state.find(i => i.id === idEdit)
         const changedItem = {
-            ...itemToChange,
-            content: action.data.newContent
+            title: action.data.newItem.title,
+            content: action.data.newItem.content,
+            category: action.data.newItem.category,
+            id: itemToChange.id
         }
-        return state.map(item =>
-            item.id !== id ? item : changedItem
+      return state.map(item =>
+            item.id !== idEdit ? item : changedItem
             )
     case 'DELETE':
-      return state
+      const idDelete = action.data
+      const itemToDelete = state.find(i => i.id === idDelete)
+      return state.filter(item => item !== itemToDelete)
     case 'NEW':
       const newState = state.concat(action.data)
-      console.log(newState.sort(alphaSort))
-      return newState
+      return newState.sort(alphaSort)
     default: 
       return state
   }
 }
   
-const editItem = (id, content) => {
+const editItem = (id, newItem) => {
   return {
-    type: 'VOTE',
+    type: 'EDIT_CONTENT',
     data: {
       id,
-      content
+      newItem
     }
   }
 }
@@ -68,5 +71,12 @@ const newItem = (item) => {
   }
 }
 
-export { editItem, newItem }
+const deleteItem = (id) => {
+  return {
+    type: 'DELETE',
+    data: id
+  }
+}
+
+export { editItem, newItem, deleteItem }
 export default reducer

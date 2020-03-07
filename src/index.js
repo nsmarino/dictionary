@@ -8,16 +8,15 @@ import itemReducer from './reducers/itemReducer'
 import filterReducer from './reducers/filterReducer'
 import selectionReducer from './reducers/selectionReducer'
 import categoryReducer from './reducers/categoryReducer'
-import categoryViewReducer from './reducers/categoryViewReducer'
-import formViewReducer from './reducers/formViewReducer'
+
+import viewReducer from './reducers/viewReducer'
 
 const reducer = combineReducers({
     items: itemReducer,
     filter: filterReducer,
     selection: selectionReducer,
     categories: categoryReducer,
-    categoryView: categoryViewReducer,
-    formView: formViewReducer,
+    view: viewReducer,
   })
 
 const store = createStore(reducer)

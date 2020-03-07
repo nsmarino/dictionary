@@ -1,14 +1,12 @@
 import React from 'react'
 import ReduxCategories from './ReduxCategories'
 import { setSelection } from '../reducers/selectionReducer'
-import { setCategories } from '../reducers/categoryReducer'
-import { toggleCatView } from '../reducers/categoryViewReducer'
-import { toggleFormView } from '../reducers/formViewReducer'
+import { toggleFormView, toggleCategoriesView } from '../reducers/viewReducer'
 
 const ReduxList = ({store}) => {
   
     // used to toggle between alphabetical and category views
-  const categoryView = store.getState().categoryView
+  const categoryView = store.getState().view.categories
 
     // populates ul with items from store
   const items = store.getState().items
@@ -29,38 +27,17 @@ const ReduxList = ({store}) => {
     selectItem(matchingItem)
   }
 
-    // called by showCategories
-  const categorySort = (collection) => {
-    const allCategories = collection.map(s => s.category)
-
-    function onlyUnique(value, index, self) { 
-      return self.indexOf(value) === index;
-    }
-    const uniqueCats = allCategories.filter(onlyUnique).sort()
-  
-    // const uniqueCatObjects = uniqueCats.map(cat => {
-    //   const matchingItems = collection.filter(i => i.category === cat)
-    //   const catObj = {
-    //     category: cat,
-    //     items: matchingItems
-    //   }
-    //   return catObj
-    // })
-
-    return uniqueCats
-  }
-
     // toggles category view
   const showCategories = () => {
-      const cats = categorySort(items)
-      store.dispatch(setCategories(cats))
-      store.dispatch(toggleCatView())
+      // const cats = categorySort(items)
+      // store.dispatch(setCategories(cats))
+      store.dispatch(toggleCategoriesView())
     }
 
   return (
     <div>
       <h2>dictionary</h2> 
-      <button onClick={showCategories}>for category</button>
+      <button onClick={showCategories}>{categoryView ? 'view by category' : 'view all'}</button>
 
     { categoryView ? 
          <ul onClick={handleClick}>
@@ -75,3 +52,24 @@ const ReduxList = ({store}) => {
 }
 
 export default ReduxList
+
+   // called by showCategories
+  // const categorySort = (collection) => {
+  //   const allCategories = collection.map(s => s.category)
+
+  //   function onlyUnique(value, index, self) { 
+  //     return self.indexOf(value) === index;
+  //   }
+  //   const uniqueCats = allCategories.filter(onlyUnique).sort()
+  
+  //   // const uniqueCatObjects = uniqueCats.map(cat => {
+  //   //   const matchingItems = collection.filter(i => i.category === cat)
+  //   //   const catObj = {
+  //   //     category: cat,
+  //   //     items: matchingItems
+  //   //   }
+  //   //   return catObj
+  //   // })
+
+  //   return uniqueCats
+  // }
