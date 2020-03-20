@@ -1,11 +1,14 @@
 import React from 'react'
 import { deleteItem } from '../reducers/itemReducer'
-import { toggleEditorView } from '../reducers/viewReducer'
+import { formView, editForm } from '../reducers/formReducer'
+
+import { useSelector, useDispatch } from 'react-redux'
 
 
-const ReduxSelection = ({store}) => {
-
-  const selection = store.getState().selection
+const ReduxSelection = () => {
+  
+  const dispatch = useDispatch()
+  const selection = useSelector(state => state.selection)
 
   const handleCopy = () => {
     var textField = document.createElement('textarea')
@@ -18,12 +21,13 @@ const ReduxSelection = ({store}) => {
   }
 
 
-  const switchToEditor = () => {
-    store.dispatch(toggleEditorView())
+  const switchToForm = () => {
+    dispatch(editForm(selection))
+    dispatch(formView())
   }
 
   const handleDelete = () => {
-    store.dispatch(deleteItem(selection.id))
+    dispatch(deleteItem(selection.id))
   }
 
   return (
@@ -38,7 +42,7 @@ const ReduxSelection = ({store}) => {
         
         <div className="snippetButtonsContainer">
           <button className="copy" onClick={handleCopy}>copy</button>
-          <button onClick={switchToEditor}>edit</button>
+          <button onClick={switchToForm}>edit</button>
           <button onClick={handleDelete}>delete</button> 
         </div>
     </div>

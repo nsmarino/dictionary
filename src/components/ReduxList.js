@@ -1,23 +1,32 @@
 import React from 'react'
 import ReduxCategories from './ReduxCategories'
 import { setSelection } from '../reducers/selectionReducer'
-import { toggleFormView, toggleCategoriesView } from '../reducers/viewReducer'
+import { toggleCategoriesView } from '../reducers/viewReducer'
 
-const ReduxList = ({store}) => {
+import { formView } from '../reducers/formReducer'
+
+import { useSelector, useDispatch } from 'react-redux'
+
+const ReduxList = () => {
   
-    // used to toggle between alphabetical and category views
-  const categoryView = store.getState().view.categories
-
-    // populates ul with items from store
-  const items = store.getState().items
-
+  // to be used throughout when dispatching to store
+  const dispatch = useDispatch()
+  
+  // used to toggle between alphabetical and category views
+  const categoryView = useSelector(state => state.view.categories)
+  // populates ul with items from store
+  const items = useSelector(state => state.items)
   // input into search bar will filter titles
-  const filteredItems = items.filter(i => i.content.toLowerCase().includes(store.getState().filter) || i.title.toLowerCase().includes(store.getState().filter) )
+
+  const filter = useSelector(state => state.filter)
+
+  const filteredItems = items.filter(i => i.content.toLowerCase().includes(filter) || i.title.toLowerCase().includes(filter) )
+
 
   const showItems = () => filteredItems.map(i => <li key={i.id}>{i.title}</li>)
   
     // called by handleClick
-  const selectItem = (target) => store.dispatch(setSelection(target))
+  const selectItem = (target) => dispatch(setSelection(target))
 
     // selects item (bubbling)
   const handleClick = (event) => {
@@ -28,11 +37,7 @@ const ReduxList = ({store}) => {
   }
 
     // toggles category view
-  const showCategories = () => {
-      // const cats = categorySort(items)
-      // store.dispatch(setCategories(cats))
-      store.dispatch(toggleCategoriesView())
-    }
+  const showCategories = () => dispatch(toggleCategoriesView())
 
   return (
     <div>
@@ -44,9 +49,9 @@ const ReduxList = ({store}) => {
            {showItems()}
          </ul>
         :
-         <ReduxCategories store={store} handleClick={handleClick} />
+         <ReduxCategories handleClick={handleClick} />
        }
-       <button onClick={()=>store.dispatch(toggleFormView())}>new</button>
+       <button onClick={()=> dispatch(formView())}>new</button>
       </div>
   )     
 }

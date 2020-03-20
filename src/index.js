@@ -1,36 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { createStore, combineReducers } from 'redux'
 import App from './App';
 
-import itemReducer from './reducers/itemReducer'
-import filterReducer from './reducers/filterReducer'
-import selectionReducer from './reducers/selectionReducer'
-import categoryReducer from './reducers/categoryReducer'
+import { Provider } from 'react-redux'
 
-import viewReducer from './reducers/viewReducer'
+import store from './store'
 
-const reducer = combineReducers({
-    items: itemReducer,
-    filter: filterReducer,
-    selection: selectionReducer,
-    categories: categoryReducer,
-    view: viewReducer,
-  })
-
-const store = createStore(reducer)
-
-const render = () => {
-    ReactDOM.render(
-      <App store={store} />,
-      document.getElementById('root')
-    )
-  }
-  
-  // in a react-redux app you must always call an initial render,
-  // then subscribe the store to it.
-  console.log(store.getState())
-  render()
-  store.subscribe(render)
-  store.subscribe(() => console.log(store.getState()))
+ReactDOM.render(
+  <Provider store={store}>
+  <App />
+  </Provider>,
+  document.getElementById('root')
+)

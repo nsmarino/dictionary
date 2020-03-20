@@ -1,31 +1,38 @@
 import React from 'react'
 import { toggleAddCategoryView } from '../reducers/viewReducer'
+import { useSelector, useDispatch } from 'react-redux'
 
-const ReduxCategorySelect = ({store, selection}) => {
+const ReduxCategorySelect = ({ selection }) => {
 
-// selection is passed as actual selection in the editor
-// and is simply passed as 'false' from the create-new form
+  const dispatch = useDispatch()
 
-  const addCatFormVis = store.getState().view.addCategory
-
+  // selection is passed as actual selection in the editor
+  // and is simply passed as 'false' from the create-new form
+  const addCatFormVis = useSelector(state => state.view.addCategory)
+  
   const showAddCategory = (event) => {
     event.preventDefault()
-    store.dispatch(toggleAddCategoryView())
+    dispatch(toggleAddCategoryView())
   }
 //   const selection = store.getState().selection
-  const categories = store.getState().categories
+  const categories = useSelector(state => state.categories)
 
-  const categoryMap = () => categories.map(cat => 
-    cat === selection.category ?
-      <option key={cat} selected>{cat}</option>
-      : 
-      <option key={cat}>{cat}</option>
-  )
+  // const categoryMap = () => categories.map(cat => 
+  //   cat === selection.category ?
+  //     <option key={cat} selected>{cat}</option>
+  //     : 
+  //     <option key={cat}>{cat}</option>
+  // )
   return (
     <p>category 
       {addCatFormVis ?
         <select name="category" id="category">
-          {categoryMap()}
+          {categories.map(cat => 
+            cat === selection.category ?
+              <option key={cat} selected>{cat}</option>
+              : 
+              <option key={cat}>{cat}</option>
+          )}
         </select>
         :
         <input name="newCat" />
